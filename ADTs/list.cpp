@@ -1,35 +1,25 @@
 // Abstract Data Type: List
 // A list is a finite sequence of data items in a certain linear order.
 #include <iostream>
+#include <limits>
 using namespace std;
 
 const int MAX_SIZE = 100;
 
-// 1. Define a struct for the List:
-//    - Include an array to store elements.
-//    - Include an integer to track the current size.
-//    - Define a constant for the maximum allowed size.
-//    - Ensure the struct has a semicolon at the end.
+// struct for the List:
 struct List
 {
     int data[MAX_SIZE];
     int currSize;
 };
 
-// 2. Implement a function to initialize the list:
-//    - Take a reference to a List object as a parameter.
-//    - Set the size to 0.
+// initialize the list
 void initList(List& lst)
 {
     lst.currSize = 0;
 }
 
-// 3. Implement a function to add an element to the front:
-//    - Take a reference to a List object as a parameter.
-//    - Check if the list is full before inserting.
-//    - Shift all existing elements to the right.
-//    - Insert the new element at index 0.
-//    - Increment the size.
+// function to add an element to the front
 void addFront(List& lst, int newElement)
 {
     if (lst.currSize >= MAX_SIZE)
@@ -49,9 +39,7 @@ void addFront(List& lst, int newElement)
     lst.currSize++;
 }
 
-// 4. Implement a function to get the first element:
-//    - Check if the list is empty.
-//    - Return the first element.
+// function to get the first element
 int getFirst(const List& lst)
 {
     if (lst.currSize == 0)
@@ -62,10 +50,7 @@ int getFirst(const List& lst)
     return lst.data[0];
 }
 
-// 5. Implement a function to get the rest of the list:
-//    - Create a new list.
-//    - Copy all elements except the first one into the new list.
-//    - Return the new list.
+// function to get the rest of the list
 List getRest(const List& lst)
 {
     List restList;
@@ -79,15 +64,13 @@ List getRest(const List& lst)
     return restList;
 }
 
-// 6. Implement a function to check if the list is empty:
-//    - Return true if the size is 0, otherwise return false.
+// function to check if the list is empty
 bool isEmpty(const List& lst)
 {
     return lst.currSize == 0;
 }
 
-// 7. Implement a function to print the list:
-//    - Loop through the array and print each element.
+// function to print the list
 void printList(const List& lst)
 {
     if (lst.currSize == 0)
@@ -103,20 +86,20 @@ void printList(const List& lst)
     cout << endl;
 }
 
-// 8. Implement a main function to:
-//    - Create and initialize a list.
-//    - Add elements to the list.
-//    - Print the list.
-//    - Get and print the first element.
-//    - Get and print the rest of the list.
 int main()
 {
     List myList;
     initList(myList);
 
-    addFront(myList, 10);
-    addFront(myList, 20);
-    addFront(myList, 30);
+    cout << "Enter numbers into the list (Press 'f' to stop):" << endl;
+    int number;
+    while (cin >> number)
+    {
+        addFront(myList, number);
+    }
+    cin.clear(); // Clear the error state of cin
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore the remaining input
+
 
     cout << "List elements: ";
     printList(myList);
