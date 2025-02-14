@@ -15,8 +15,14 @@ void selectionSort(int arr[], int size)
 {
     for (int i = 0; i < size; i++)
     {
-        int smallest = i;
-        for ( 
+        int minIdx = i;
+        for (int j = i + 1; j < size; j++){
+            if (arr[j] < arr[minIdx]){
+                minIdx = j;
+            }
+        }
+        swap(arr[i], arr[minIdx]);
+    }
 }
 
 void printArray(int arr[], int size)
@@ -36,11 +42,11 @@ void printArray(int arr[], int size)
 int main()
 {
     cout << "Selection Sort" << endl;
-    // declare integer array size 15
     int arr[15];
     int size = sizeof(arr) / sizeof(arr[0]);
     // range of random numbers
     int min = 1, max = 60;
+
     // initialize random number generator
     random_device rd;
     mt19937 gen(rd());
