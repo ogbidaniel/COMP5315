@@ -33,7 +33,7 @@ void printArray(int arr[], int size)
 int main()
 {
     cout << "Selection Sort" << endl;
-    // declare integer array
+    // declare integer array size 15
     int arr[15];
     int size = sizeof(arr) / sizeof(arr[0]);
     // range of random numbers
