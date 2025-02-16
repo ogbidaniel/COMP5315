@@ -16,7 +16,7 @@ void merge(int arr[], int left, int mid, int right) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
     
-    int L[n1], R[n2];
+    int L[n1], R[n2]; // create temp arrays
     
     // Copy data to temporary arrays
     for (int i = 0; i < n1; i++)
@@ -83,7 +83,7 @@ int main()
     int arr[15];
     int size = sizeof(arr) / sizeof(arr[0]);
     // range of random numbers
-    int min = 1, max = 60;
+    int min = 1, max = 100;
 
     // initialize random number generator
     random_device rd;

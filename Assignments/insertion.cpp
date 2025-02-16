@@ -20,7 +20,7 @@ void insertionSort(int arr[], int size)
         int j = i - 1;
         while (j >= 0 && arr[j] > key){
             arr[j + 1] = arr[j];
-            j = j - 1;
+            j--;
         }
         arr[j + 1] = key;
     }
@@ -46,7 +46,7 @@ int main()
     int arr[15];
     int size = sizeof(arr) / sizeof(arr[0]);
     // range of random numbers
-    int min = 1, max = 60;
+    int min = 1, max = 100;
 
     // initialize random number generator
     random_device rd;

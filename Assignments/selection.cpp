@@ -45,7 +45,7 @@ int main()
     int arr[15];
     int size = sizeof(arr) / sizeof(arr[0]);
     // range of random numbers
-    int min = 1, max = 60;
+    int min = 1, max = 100;
 
     // initialize random number generator
     random_device rd;
