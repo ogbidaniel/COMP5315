@@ -11,38 +11,40 @@
 #include <random>
 using namespace std;
 
-// Function to create a max heap using bottom-up heap construction
-void HeapBottomUp(int H[], int n) {
-    for (int i = n / 2 - 1; i >= 0; i--) {
-        int k = i, v = H[k];
-        bool heap = false;
+void heapify(int arr[], int n, int i) {
+    int largest = i;       // Root
+    int left = 2 * i + 1;  // Left child
+    int right = 2 * i + 2; // Right child
 
-        while (!heap && (2 * k + 1) < n) {  // Ensure k has at least one child
-            int j = 2 * k + 1;  // Left child
-            if (j + 1 < n && H[j] < H[j + 1]) {  // If right child exists and is greater
-                j = j + 1;
-            }
+    // If left child is larger than root
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
 
-            if (v >= H[j]) {
-                heap = true;
-            } else {
-                H[k] = H[j];  // Move larger child up
-                k = j;  // Move down in the heap
-            }
-        }
-        H[k] = v;  // Place v in final position
+    // If right child is larger than largest so far
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    // If the largest is not the root
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);  // Recursively heapify the affected subtree
     }
 }
 
-// Function to perform heap sort
+// build max heap
+void buildMaxHeap(int arr[], int n) {
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(arr, n, i);
+    }
+}
 void heapSort(int arr[], int n) {
-    // Step 1: Build the max heap
-    HeapBottomUp(arr, n);
+    // Step 1: Build the max heap in O(n)
+    buildMaxHeap(arr, n);
 
-    // Step 2: Extract elements from heap one by one
+    // Step 2: Extract elements one by one
     for (int i = n - 1; i > 0; i--) {
-        swap(arr[0], arr[i]);  // Move max element to end
-        HeapBottomUp(arr, i);  // Rebuild the heap for remaining elements
+        swap(arr[0], arr[i]);  // Move current root to end
+        heapify(arr, i, 0);    // Heapify the reduced heap
     }
 }
 

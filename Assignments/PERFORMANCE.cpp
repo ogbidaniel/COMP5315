@@ -6,12 +6,6 @@
 *   COMP5315 - Design and Analysis of Algorithms
 *============================================================
 
-*   Objective:
-*   - Compare the execution time of different sorting algorithms on different input sizes.
-*   - Run each algorithm **10 times** per array size and record the **average execution time**.
-*   - Array sizes tested: **100, 1000, 10000, 100000**.
-*   - Store the results in a format that can be exported to **Excel** for visualization.
-
 *   Sorting Algorithms to Implement:
 *   1. Selection Sort
 *   2. Insertion Sort
@@ -22,7 +16,7 @@
 */
 
 #include <iostream>
-#include <vector>
+#include <chrono>
 #include <random>
 using namespace std;
 
@@ -30,7 +24,7 @@ using namespace std;
 void generateRandomArray(int arr[], int size) {
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> dis(1, 10000);
+    uniform_int_distribution<> dis(1, 100000); // max 100000
 
     for (int i = 0; i < size; ++i) {
         arr[i] = dis(gen);
@@ -164,39 +158,43 @@ void quickSort(int arr[], int left, int right) {
     }
 }
 // HEAP SORT
-// Function to create a max heap using bottom-up heap construction
-void HeapBottomUp(int H[], int n) {
+void heapify(int arr[], int n, int i) {
+    int largest = i;       // Root
+    int left = 2 * i + 1;  // Left child
+    int right = 2 * i + 2; // Right child
+
+    // If left child is larger than root
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+
+    // If right child is larger than largest so far
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    // If the largest is not the root
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);  // Recursively heapify the affected subtree
+    }
+}
+
+// build max heap
+void buildMaxHeap(int arr[], int n) {
     for (int i = n / 2 - 1; i >= 0; i--) {
-        int k = i, v = H[k];
-        bool heap = false;
-
-        while (!heap && (2 * k + 1) < n) {  // Ensure k has at least one child
-            int j = 2 * k + 1;  // Left child
-            if (j + 1 < n && H[j] < H[j + 1]) {  // If right child exists and is greater
-                j = j + 1;
-            }
-
-            if (v >= H[j]) {
-                heap = true;
-            } else {
-                H[k] = H[j];  // Move larger child up
-                k = j;  // Move down in the heap
-            }
-        }
-        H[k] = v;  // Place v in final position
+        heapify(arr, n, i);
     }
 }
-// Function to perform heap sort
 void heapSort(int arr[], int n) {
-    // Step 1: Build the max heap
-    HeapBottomUp(arr, n);
+    // Step 1: Build the max heap in O(n)
+    buildMaxHeap(arr, n);
 
-    // Step 2: Extract elements from heap one by one
+    // Step 2: Extract elements one by one
     for (int i = n - 1; i > 0; i--) {
-        swap(arr[0], arr[i]);  // Move max element to end
-        HeapBottomUp(arr, i);  // Rebuild the heap for remaining elements
+        swap(arr[0], arr[i]);  // Move current root to end
+        heapify(arr, i, 0);    // Heapify the reduced heap
     }
 }
+
 // RADIX SORT
 // Function to perform Counting Sort on a specific digit
 void countingSort(int arr[], int n, int exp) {
@@ -226,8 +224,6 @@ void countingSort(int arr[], int n, int exp) {
         arr[i] = output[i];
     }
 }
-
-// Function to perform Radix Sort
 void radixSort(int arr[], int n) {
     // Find the maximum number to determine the number of digits
     int maxNum = arr[0];
@@ -245,22 +241,18 @@ void radixSort(int arr[], int n) {
 // BUCKET SORT
 const int BUCKET_COUNT = 10;// Maximum number of buckets
 void bucketSort(int arr[], int n, int maxValue) {
-    // Step 1: Create buckets (each bucket has a max of `n` elements initially)
     int buckets[BUCKET_COUNT][n]; 
     int bucketSizes[BUCKET_COUNT] = {0}; // Track sizes of each bucket
 
-    // Step 2: Distribute elements into buckets
     for (int i = 0; i < n; i++) {
         int bucketIndex = (arr[i] * BUCKET_COUNT) / (maxValue + 1); // Compute bucket index
         buckets[bucketIndex][bucketSizes[bucketIndex]++] = arr[i]; // Add element to bucket
     }
 
-    // Step 3: Sort each bucket using Insertion Sort
     for (int i = 0; i < BUCKET_COUNT; i++) {
-        insertionSort(buckets[i], bucketSizes[i]);
+        insertionSort(buckets[i], bucketSizes[i]); // use insertion sort to sort bucket
     }
 
-    // Step 4: Concatenate all sorted buckets back into original array
     int index = 0;
     for (int i = 0; i < BUCKET_COUNT; i++) {
         for (int j = 0; j < bucketSizes[i]; j++) {
@@ -268,12 +260,104 @@ void bucketSort(int arr[], int n, int maxValue) {
         }
     }
 }
+
+// Main Script
 int main() {
     cout << "Algorithm Performance Profiler\n";
-    // Declare array of size [100], [1000], [10000] and [100000]
-    int size = {100}; // modify size to change size of array
-    int arr[size];
-    generateRandomArray(arr, size);
-    printArray(arr, size);
+
+    // Declare array sizes to test
+    int sizes[] = {100, 1000, 10000, 100000};
+
+    for (int size : sizes) {
+        cout << "\nArray Size: " << size << endl;
+        int arr[size];
+        int max = 100000;
+        generateRandomArray(arr, size);
+
+        // Selection Sort
+        long long average = 0;
+        for (int i = 0; i < 10; i++) {
+            int temp[size];
+            copy(arr, arr + size, temp);  // Copy original array
+            auto start = chrono::high_resolution_clock::now();
+            selectionSort(temp, size);
+            auto end = chrono::high_resolution_clock::now();
+            average += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        }
+        cout << "Selection Sort duration: " << average / 10 << " ns" << endl;
+
+        // Insertion Sort
+        average = 0;
+        for (int i = 0; i < 10; i++) {
+            int temp[size];
+            copy(arr, arr + size, temp);
+            auto start = chrono::high_resolution_clock::now();
+            insertionSort(temp, size);
+            auto end = chrono::high_resolution_clock::now();
+            average += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        }
+        cout << "Insertion Sort duration: " << average / 10 << " ns" << endl;
+
+        // Merge Sort
+        average = 0;
+        for (int i = 0; i < 10; i++) {
+            int temp[size];
+            copy(arr, arr + size, temp);
+            auto start = chrono::high_resolution_clock::now();
+            mergeSort(temp, 0, size - 1);
+            auto end = chrono::high_resolution_clock::now();
+            average += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        }
+        cout << "Merge Sort duration: " << average / 10 << " ns" << endl;
+
+        // Quick Sort
+        average = 0;
+        for (int i = 0; i < 10; i++) {
+            int temp[size];
+            copy(arr, arr + size, temp);
+            auto start = chrono::high_resolution_clock::now();
+            quickSort(temp, 0, size - 1);
+            auto end = chrono::high_resolution_clock::now();
+            average += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        }
+        cout << "Quick Sort duration: " << average / 10 << " ns" << endl;
+
+        // Heap Sort
+        average = 0;
+        for (int i = 0; i < 10; i++) {
+            int temp[size];
+            copy(arr, arr + size, temp);
+            auto start = chrono::high_resolution_clock::now();
+            heapSort(temp, size);
+            auto end = chrono::high_resolution_clock::now();
+            average += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        }
+        cout << "Heap Sort duration: " << average / 10 << " ns" << endl;
+
+        // Radix Sort
+        average = 0;
+        for (int i = 0; i < 10; i++) {
+            int temp[size];
+            copy(arr, arr + size, temp);
+            auto start = chrono::high_resolution_clock::now();
+            radixSort(temp, size);
+            auto end = chrono::high_resolution_clock::now();
+            average += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        }
+        cout << "Radix Sort duration: " << average / 10 << " ns" << endl;
+
+        // Bucket Sort
+        average = 0;
+        for (int i = 0; i < 10; i++) {
+            int temp[size];
+            copy(arr, arr + size, temp);
+            auto start = chrono::high_resolution_clock::now();
+            bucketSort(temp, size, max);
+            auto end = chrono::high_resolution_clock::now();
+            average += chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+        }
+        cout << "Bucket Sort duration: " << average / 10 << " ns" << endl;
+    }
+
     return 0;
 }
